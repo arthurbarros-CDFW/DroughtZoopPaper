@@ -1,0 +1,28 @@
+
+Family: ziplss 
+Link function: identity identity 
+
+Formula:
+as.integer(BPUE) ~ s(salinity) + s(month, k = 5) + s(Station, 
+    bs = "re")
+~s(salinity) + s(Station, bs = "re")
+
+Parametric coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -996.0653    10.5190 -94.692  < 2e-16 ***
+(Intercept).1   -0.9405     0.1694  -5.552 2.82e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                 edf Ref.df    Chi.sq  p-value    
+s(salinity)    8.999  9.000  16949.22  < 2e-16 ***
+s(month)       3.996  4.000  54913.64  < 2e-16 ***
+s(Station)    13.979 15.000 348133.06  < 2e-16 ***
+s.1(salinity)  5.865  6.687    467.32  < 2e-16 ***
+s.1(Station)  10.886 14.000     86.34 2.43e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Deviance explained =   48%
+-REML = 3.893e+05  Scale est. = 1         n = 2340

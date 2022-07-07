@@ -1,0 +1,21 @@
+
+Family: Negative Binomial(0.174) 
+Link function: log 
+
+Formula:
+BPUE ~ s(salinity)
+
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   2.5684     0.2389   10.75   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+              edf Ref.df Chi.sq p-value    
+s(salinity) 6.496  7.018   2728  <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.00866   Deviance explained = 45.4%
+-REML = 7741.6  Scale est. = 1         n = 2341

@@ -1,0 +1,9 @@
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = BPUE ~ Drought, data = d)
+
+$Drought
+         diff       lwr      upr     p adj
+W-D -221.5983 -557.8145 114.6178 0.1952853
+

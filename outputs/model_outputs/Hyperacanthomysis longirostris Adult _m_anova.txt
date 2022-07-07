@@ -1,0 +1,9 @@
+Analysis of Deviance Table
+
+Model 1: BPUE ~ s(salinity)
+Model 2: BPUE ~ s(salinity) + s(scaled_temp)
+Model 3: BPUE ~ s(salinity) + s(scaled_temp) + s(month, k = 5)
+  Resid. Df Resid. Dev     Df Deviance
+1    2508.8      31763                
+2    2499.9      31653 8.8955   110.44
+3    2495.0      31494 4.8941   158.74

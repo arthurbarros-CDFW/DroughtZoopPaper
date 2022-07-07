@@ -1,0 +1,21 @@
+
+Family: Negative Binomial(0.12) 
+Link function: log 
+
+Formula:
+BPUE ~ s(beg_surf_temp)
+
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   6.3479     0.0618   102.7   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                   edf Ref.df Chi.sq p-value    
+s(beg_surf_temp) 7.127  8.172  228.9  <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.0278   Deviance explained = 4.39%
+-REML =  11715  Scale est. = 1         n = 2193

@@ -1,0 +1,25 @@
+
+Family: Negative Binomial(0.423) 
+Link function: log 
+
+Formula:
+BPUE ~ Drought + s(salinity, by = Drought)
+
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  6.93065    0.05053 137.147  < 2e-16 ***
+DroughtN     0.26108    0.08240   3.169  0.00153 ** 
+DroughtW     0.09770    0.08289   1.179  0.23853    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                       edf Ref.df Chi.sq p-value    
+s(salinity):DroughtD 5.259  6.392 1981.2  <2e-16 ***
+s(salinity):DroughtN 4.107  5.039  681.3  <2e-16 ***
+s(salinity):DroughtW 3.644  4.469  511.8  <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.135   Deviance explained = 37.5%
+-REML =  16937  Scale est. = 1         n = 2188

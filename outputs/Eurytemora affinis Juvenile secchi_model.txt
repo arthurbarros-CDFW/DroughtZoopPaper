@@ -1,0 +1,21 @@
+
+Family: Negative Binomial(0.031) 
+Link function: log 
+
+Formula:
+BPUE ~ s(secchi)
+
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   1.7732     0.1735   10.22   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+            edf Ref.df Chi.sq  p-value    
+s(secchi) 3.432  4.316  35.35 2.34e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.00645   Deviance explained = 8.07%
+-REML = 1158.3  Scale est. = 1         n = 1096

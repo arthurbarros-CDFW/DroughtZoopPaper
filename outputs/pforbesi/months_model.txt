@@ -1,0 +1,21 @@
+
+Family: Negative Binomial(0.307) 
+Link function: log 
+
+Formula:
+BPUE ~ s(month, bs = "cc")
+
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  6.43857    0.02872   224.1   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+           edf Ref.df Chi.sq p-value    
+s(month) 7.658      8   3779  <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.141   Deviance explained = 31.6%
+-REML =  27063  Scale est. = 1         n = 3956

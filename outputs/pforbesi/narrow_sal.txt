@@ -1,0 +1,5 @@
+             Df    Sum Sq   Mean Sq F value Pr(>F)  
+Drought       2 4.132e+09 2.066e+09   3.059 0.0493 *
+Residuals   185 1.249e+11 6.752e+08                 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
