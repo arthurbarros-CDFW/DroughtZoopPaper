@@ -1,0 +1,60 @@
+
+Call:
+zeroinfl(formula = as.integer(BPUE) ~ . | salinity + month + Station, data = d, dist = "negbin")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-0.5702 -0.3745 -0.3183 -0.1683 36.7418 
+
+Count model coefficients (negbin with log link):
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   9.09528    0.25192  36.103  < 2e-16 ***
+salinity     -0.08858    0.01899  -4.664 3.10e-06 ***
+month        -0.33306    0.02668 -12.485  < 2e-16 ***
+StationNZ032  1.68423    0.21156   7.961 1.71e-15 ***
+StationNZ048  1.73669    0.20866   8.323  < 2e-16 ***
+StationNZ054  1.50628    0.21557   6.988 2.80e-12 ***
+StationNZ060  1.12328    0.22986   4.887 1.03e-06 ***
+StationNZ064  1.14991    0.25877   4.444 8.84e-06 ***
+StationNZ074 -0.39152    0.24567  -1.594 0.111003    
+StationNZ080 -1.05396    0.67179  -1.569 0.116673    
+StationNZ086 -3.20722    0.31180 -10.286  < 2e-16 ***
+StationNZ092  1.19413    0.28992   4.119 3.81e-05 ***
+StationNZD06  1.69864    0.22115   7.681 1.58e-14 ***
+StationNZD16 -2.54267    0.27801  -9.146  < 2e-16 ***
+StationNZD28 -4.60086    0.46745  -9.842  < 2e-16 ***
+StationNZEZ2  0.93577    0.28707   3.260 0.001115 ** 
+StationNZEZ6  1.11410    0.29335   3.798 0.000146 ***
+StationNZM10 -4.61906    0.71563  -6.455 1.09e-10 ***
+StationNZS42  2.00658    0.20911   9.596  < 2e-16 ***
+DroughtN      0.40865    0.10580   3.863 0.000112 ***
+DroughtW      0.32417    0.11392   2.845 0.004435 ** 
+Log(theta)   -1.12328    0.03954 -28.409  < 2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)     0.42781    0.19089   2.241 0.025017 *  
+salinity        0.01635    0.01454   1.125 0.260706    
+month          -0.03232    0.02061  -1.568 0.116839    
+StationNZ032   -0.29436    0.16951  -1.736 0.082477 .  
+StationNZ048   -0.32178    0.16942  -1.899 0.057517 .  
+StationNZ054   -0.29063    0.17463  -1.664 0.096056 .  
+StationNZ060   -0.22660    0.18454  -1.228 0.219478    
+StationNZ064   -0.10046    0.19810  -0.507 0.612075    
+StationNZ074   -0.28477    0.19670  -1.448 0.147680    
+StationNZ080   -0.42877    0.63389  -0.676 0.498782    
+StationNZ086    0.79510    0.23954   3.319 0.000902 ***
+StationNZ092    0.74552    0.21811   3.418 0.000630 ***
+StationNZD06   -0.28234    0.18293  -1.543 0.122732    
+StationNZD16    0.42292    0.22200   1.905 0.056768 .  
+StationNZD28    1.87009    0.33567   5.571 2.53e-08 ***
+StationNZEZ2   -0.26453    0.23302  -1.135 0.256283    
+StationNZEZ6   -0.30748    0.24159  -1.273 0.203113    
+StationNZM10  -14.73488  774.31845  -0.019 0.984818    
+StationNZS42  -20.65767 2244.34492  -0.009 0.992656    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta = 0.3252 
+Number of iterations in BFGS optimization: 56 
+Log-likelihood: -1.668e+04 on 41 Df
