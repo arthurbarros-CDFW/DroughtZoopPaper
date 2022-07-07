@@ -27,9 +27,14 @@ StationLookUp <- read_excel("data/StationLookUp.xlsx")
 EMP_BPUE<-Zoop_BPUE%>%filter(Source=="EMP")
 
 #set dates, years, months
-EMP_BPUE$SampleDate<-as.Date(EMP_BPUE$Date,"%m/%d/%Y")
+#EMP_BPUE$SampleDate<-as.Date(EMP_BPUE$Date,"%m/%d/%Y")
+#It looks like this read in the dates as dates already, so you don't need this step
+
+EMP_BPUE$SampleDate<-EMP_BPUE$Date
 EMP_BPUE$month<-as.numeric(format(as.Date(EMP_BPUE$SampleDate), "%m"))
 EMP_BPUE$year<-as.numeric(format(as.Date(EMP_BPUE$SampleDate), "%Y"))
+#you can use the 'lubridate' package, which has the 'month' and 'year' functions. I can show you sometime if you like.
+
 
 #need to filter for target taxa within target gear/size class
 Taxlifestage<-c("Bosmina longirostris Adult",
@@ -47,7 +52,10 @@ EMP_BPUE<-dplyr::select(EMP_BPUE,-SizeClass)%>%ungroup()
 
 #set stations for env data
 ZPEnvData_stations<-ZPEnvData%>%inner_join(StationLookUp)
-ZPEnvData_stations$SampleDate<-as.Date(ZPEnvData_stations$SampleDate,"%m/%d/%Y")
+
+#this got read in correctly, so not needed
+#ZPEnvData_stations$SampleDate<-as.Date(ZPEnvData_stations$SampleDate,"%m/%d/%Y")
+
 ZPEnvData_stations$Station<-ZPEnvData_stations$StationNZ
 ZPEnvData_stations<-ZPEnvData_stations%>%filter(Core==1)
 ZPEnvData<-dplyr::select(ZPEnvData_stations,SampleDate,Station,secchi,beg_surf_temp,beg_surf_sc)
@@ -59,7 +67,7 @@ Env_BPUE<-Env_BPUE%>%
 
 #pivot and fill in 0s
 Env_BPUE_wide<-Env_BPUE%>%pivot_wider(names_from = Taxlifestage,values_from=BPUE,values_fill=0)
-Env_BPUE<-Env_BPUE_wide%>%pivot_longer(cols=15:18,names_to="Taxlifestage",values_to="BPUE")
+Env_BPUE<-Env_BPUE_wide%>%pivot_longer(cols=14:17,names_to="Taxlifestage",values_to="BPUE")
 
 #bring in WY drought data
 WY<-read_excel("Data/Water years.xlsx", sheet="yearassignments")
@@ -97,6 +105,8 @@ for(i in 1:length(taxa)){
 ##################
 target_months<-c(5,6,7,8,9,10,11) #looking at May-Nov, when zooplankton populations are highest
 model_data<-Env_BPUE
+
+#this is a nifty script! You can also try using the ec2pss function from the 'wql' package
 source("scripts/ec_to_sal.R")
 model_data$salinity<-ec_2_sal(25,model_data$beg_surf_sc)
 
@@ -118,18 +128,29 @@ for(i in 1:length(taxa)){
   summary(m1)
   m2<-gam(BPUE~s(salinity)+s(month,k=5),family='nb',data=d)
   summary(m2)
+  
+
   m3<-zeroinfl(as.integer(BPUE)~.|salinity+month+Station,data=d,dist='negbin')
   summary(m3)
+  
+  #Now with a random effect of station
+  m4 = gamm(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d)
+  summary(m4[[1]])
+  summary(m4[[2]])
+  plot(m4[[2]])
+  
   plot.gam(m2)
+ 
   capture.output(summary(m1),file=paste("outputs/model_outputs/",t,"_m1.txt"))
   capture.output(summary(m2),file=paste("outputs/model_outputs/",t,"_m2.txt"))
   capture.output(summary(m3),file=paste("outputs/model_outputs/",t,"_m3.txt"))
+  capture.output(summary(m4),file=paste("outputs/model_outputs/",t,"_m4.txt"))
   
   #Anova or AIC to test compare model fits?
-  m_anova<-anova(m1,m2,m3)
+  m_anova<-anova(m1,m2,m3, m4)
   m_anova
   capture.output(m_anova,file=paste("outputs/model_outputs/",t,"_m_anova.txt"))
-  m_aic<-AIC(m1,m2,m3,m4)
+  m_aic<-AIC(m1,m2,m3, m4)
   m_aic
   capture.output(m_aic,file=paste("outputs/model_outputs/",t,"_m_aic.txt"))
   
@@ -139,3 +160,9 @@ for(i in 1:length(taxa)){
   dev.off()
 }
 
+#another method for random effects:
+  m5 = gamm(BPUE~s(salinity)+s(month,k=5) + s(Station, bs = "re"), niterPQL=40,family='nb',data=d)
+  summary(m5[[1]])
+  summary(m5[[2]])
+  plot(m5[[2]])
+  
