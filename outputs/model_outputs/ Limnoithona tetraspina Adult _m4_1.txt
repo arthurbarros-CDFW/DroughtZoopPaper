@@ -1,0 +1,25 @@
+
+Call:
+glm(formula = Presence ~ salinity + month, family = "binomial", 
+    data = d_pa)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.4367  -1.0434  -0.9306   1.2853   1.4783  
+
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -1.04212    0.13305  -7.833 4.78e-15 ***
+salinity     0.04281    0.00711   6.021 1.73e-09 ***
+month        0.07104    0.01645   4.319 1.56e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 5792.1  on 4248  degrees of freedom
+Residual deviance: 5719.1  on 4246  degrees of freedom
+AIC: 5725.1
+
+Number of Fisher Scoring iterations: 4
+

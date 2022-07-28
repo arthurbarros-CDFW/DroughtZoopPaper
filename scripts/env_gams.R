@@ -124,40 +124,49 @@ for(i in 1:length(taxa)){
   d<-dplyr::select(d,BPUE,salinity,month,Station,Drought)
   d$Station<-as.factor(d$Station)
   d$Drought<-as.factor(d$Drought)
+  
   m1<-gam(BPUE~s(salinity),family="nb",data=d)
   summary(m1)
   m2<-gam(BPUE~s(salinity)+s(month,k=5),family='nb',data=d)
   summary(m2)
-  
-
-  m3<-zeroinfl(as.integer(BPUE)~.|salinity+month+Station,data=d,dist='negbin')
-  summary(m3)
-  
   #Now with a random effect of station
-  m4 = gamm(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d)
-  summary(m4[[1]])
-  summary(m4[[2]])
-  plot(m4[[2]])
+  m3<-gamm(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d)
+  summary(m3[[1]])
+  summary(m3[[2]])
   
-  plot.gam(m2)
+  #try two seperate models for p/a binomial and just presence nb
+  d_pa<-d
+  d_pa$Presence<-ifelse(d_pa$BPUE>0,1,0)
+  d_p<-d_pa%>%filter(Presence==1)
+  m4.1<-glm(Presence~salinity+month,family="binomial",data=d_pa)
+  summary(m4.1)
+  m4.2<-gam(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d_p)
+  summary(m4.2)
  
   capture.output(summary(m1),file=paste("outputs/model_outputs/",t,"_m1.txt"))
   capture.output(summary(m2),file=paste("outputs/model_outputs/",t,"_m2.txt"))
-  capture.output(summary(m3),file=paste("outputs/model_outputs/",t,"_m3.txt"))
-  capture.output(summary(m4),file=paste("outputs/model_outputs/",t,"_m4.txt"))
+  capture.output(summary(m3[[2]]),file=paste("outputs/model_outputs/",t,"_m3.txt"))
+  capture.output(summary(m4.1),file=paste("outputs/model_outputs/",t,"_m4_1.txt"))
+  capture.output(summary(m4.2),file=paste("outputs/model_outputs/",t,"_m4_2.txt"))
   
   #Anova or AIC to test compare model fits?
-  m_anova<-anova(m1,m2,m3, m4)
+  m_anova<-anova(m1,m2,m3, m4.1)
   m_anova
   capture.output(m_anova,file=paste("outputs/model_outputs/",t,"_m_anova.txt"))
-  m_aic<-AIC(m1,m2,m3, m4)
+  m_aic<-AIC(m1,m2,m4.1,m4.2)
   m_aic
   capture.output(m_aic,file=paste("outputs/model_outputs/",t,"_m_aic.txt"))
   
-  png(paste("figures/gamcheck/",t,"_m4.png"))
+  png(paste("figures/gamcheck/",t,"_m4_1.png"))
   par(mfrow=c(2,2))
-  gam.check(m3)
+  gam.check(m4.1)
   dev.off()
+  
+  png(paste("figures/gamcheck/",t,"_m4_2.png"))
+  par(mfrow=c(2,2))
+  gam.check(m4.2)
+  dev.off()
+  
 }
 
 #another method for random effects:
