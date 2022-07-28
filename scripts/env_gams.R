@@ -138,8 +138,9 @@ for(i in 1:length(taxa)){
   d_pa<-d
   d_pa$Presence<-ifelse(d_pa$BPUE>0,1,0)
   d_p<-d_pa%>%filter(Presence==1)
-  m4.1<-glm(Presence~salinity+month,family="binomial",data=d_pa)
+  m4.1<-glm(Presence~salinity+ns(month,df=2),family="binomial",data=d_pa)
   summary(m4.1)
+  m41_predict<-predict(m4.1,type = "response")
   m4.2<-gam(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d_p)
   summary(m4.2)
  
