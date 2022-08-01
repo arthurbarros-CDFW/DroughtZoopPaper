@@ -7,14 +7,14 @@ BPUE ~ s(salinity) + s(month, k = 5)
 
 Parametric coefficients:
             Estimate Std. Error t value Pr(>|t|)
-(Intercept)    0.661      0.438   1.509    0.131
+(Intercept) -0.04826    0.56317  -0.086    0.932
 
 Approximate significance of smooth terms:
-              edf Ref.df     F  p-value    
-s(salinity) 5.707  5.707 54.15  < 2e-16 ***
-s(month)    2.854  2.854 17.29 6.63e-10 ***
+              edf Ref.df     F p-value    
+s(salinity) 4.805  4.805  42.6  <2e-16 ***
+s(month)    3.918  3.918 111.1  <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-R-sq.(adj) =  0.00788   
-  Scale est. = 12.799    n = 4249
+R-sq.(adj) =  0.00335   
+  Scale est. = 11.151    n = 4249

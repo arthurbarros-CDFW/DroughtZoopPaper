@@ -1,5 +1,5 @@
 #GAMS and GLMS of fecundity data
-#trying to look at time changes in mysid fecundity?
+#tr.ying to look at time changes in mysid fecundity?
 rm( list = ls()) #clear env
 
 library(tidyverse)
@@ -18,6 +18,7 @@ library(ggeffects)
 library(brms)
 library(DroughtData)
 library(rstan)
+library(lme4)
 
 Zoop_BPUE<-readRDS("data/Zoop_BPUE.rds")
 ZPEnvData<-read_excel("data/ZPEnvData.xlsx")
@@ -37,7 +38,7 @@ EMP_BPUE$year<-as.numeric(format(as.Date(EMP_BPUE$SampleDate), "%Y"))
 
 
 #need to filter for target taxa within target gear/size class
-Taxlifestage<-c("Bosmina longirostris Adult",
+Taxlifestage<-c("Daphnia Adult",
                                     "Pseudodiaptomus forbesi Adult",
                                     "Limnoithona tetraspina Adult",
                                     "Hyperacanthomysis longirostris Adult")
@@ -74,7 +75,7 @@ WY<-read_excel("Data/Water years.xlsx", sheet="yearassignments")
 WY$year<-WY$Year
 Env_BPUE<-Env_BPUE%>%inner_join(WY)
 
-target_DROUGHT_taxa<-c("Bosmina longirostris Adult",
+target_DROUGHT_taxa<-c("Daphnia Adult",
                        "Pseudodiaptomus forbesi Adult",
                        "Limnoithona tetraspina Adult",
                        "Hyperacanthomysis longirostris Adult")
@@ -115,7 +116,7 @@ model_data$salinity<-ec_2_sal(25,model_data$beg_surf_sc)
   #group_by(year,month)%>%
   #dplyr::summarise(month_temp=mean(beg_surf_temp,na.rm=T))
 #model_data<-model_data%>%
-  inner_join(temp_monthlymean)
+  #inner_join(temp_monthlymean)
 #model_data$scaled_temp<-model_data$beg_surf_temp-model_data$month_temp
 
 for(i in 1:length(taxa)){
@@ -138,7 +139,7 @@ for(i in 1:length(taxa)){
   d_pa<-d
   d_pa$Presence<-ifelse(d_pa$BPUE>0,1,0)
   d_p<-d_pa%>%filter(Presence==1)
-  m4.1<-glm(Presence~salinity+ns(month,df=2),family="binomial",data=d_pa)
+  m4.1<-glmer(Presence~salinity+ns(month,df=2)+(1|Station),family="binomial",data=d_pa)
   summary(m4.1)
   m41_predict<-predict(m4.1,type = "response")
   m4.2<-gam(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d_p)

@@ -48,7 +48,7 @@ ZPEnvData_stations<-ZPEnvData_stations%>%filter(Core==1)
 ZPEnvData<-dplyr::select(ZPEnvData_stations,SampleDate,Station,secchi,beg_surf_temp,beg_surf_sc)
 
 #filter for target taxa
-target_DROUGHT_taxa<-c("Bosmina longirostris Adult",
+target_DROUGHT_taxa<-c("Daphnia Adult",
                        "Pseudodiaptomus forbesi Adult",
                        "Limnoithona tetraspina Adult",
                        "Hyperacanthomysis longirostris Adult"
@@ -66,7 +66,7 @@ Env_BPUE<-Env_BPUE%>%
 Env_BPUE<-unique(Env_BPUE)
 
 Env_BPUE_wide<-Env_BPUE%>%pivot_wider(names_from = Taxlifestage,values_from=BPUE,values_fill=0)
-Env_BPUE<-Env_BPUE_wide%>%pivot_longer(cols=8:21,names_to="Taxlifestage",values_to="BPUE")
+Env_BPUE<-Env_BPUE_wide%>%pivot_longer(cols=8:11,names_to="Taxlifestage",values_to="BPUE")
 
 WY<-read_excel("Data/Water years.xlsx", sheet="yearassignments")
 WY$year<-WY$Year
@@ -123,12 +123,12 @@ save_plot("figures/sal_zones/bins.png",p,base_height = 4,base_width = 6)
 
 #Okay, examining the salinity ranges these are the prefered ranges based on weighted
 #means and standard deviance:
-#B longirostris: 0 - 
+#Daphnia: 0 - 
 #H longirostris: 1 - 7ppt
 #L tetraspina 1 - 15ppt
 #P forbesi <5ppt
 sal_min<-c(0.0,3.2,1.6,0.0)
-sal_max<-c(0.6,6.7,9.1,1.8)
+sal_max<-c(0.5,6.7,9.1,1.8)
 Taxlifestage<-taxa
 taxa_sal_range<-data.frame(Taxlifestage,sal_min,sal_max)
 #so next for each taxa we will do a boxplot and TukeyHSD for drought year type within target salinity range
@@ -197,7 +197,7 @@ for(i in 1:length(taxa)){
     geom_boxplot(aes())+
     theme_bw()+
     drt_color_pal_drought(aes_type = "fill")+
-    ggtitle(paste(t," salinity zone"),subtitle =paste(sal$sal_min," ppt - ",sal$sal_max," ppt",sep=""))+
+    ggtitle(paste(t," target salinity zone"),subtitle =paste(sal$sal_min," ppt - ",sal$sal_max," ppt",sep=""))+
     theme(text = element_text(size=16),legend.position = "none")+
     xlab("Year Type")+ylab("River km")+
     coord_flip()

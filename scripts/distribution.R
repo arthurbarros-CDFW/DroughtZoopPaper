@@ -25,3 +25,4 @@ dist_center<-function(data,taxa){
     group_by(Survey,seasons,Year,Taxlifestage,Regime)%>%
     dplyr::summarize(km_center=sum(km_freq)/sum(BPUE),Mean_X2=mean(X2))
 }
+

@@ -33,7 +33,7 @@ aov3_eqn1 = function(region){
   pvalue <- list(pvalue = format(summary(m)[[1]][["Pr(>F)"]][1], digits = 3))
 }
 
-target_taxa<-c("Bosmina.longirostris.Adult","Pseudodiaptomus.forbesi.Adult","Hyperacanthomysis.longirostris.Adult",
+target_taxa<-c("Daphnia.Adult","Pseudodiaptomus.forbesi.Adult","Hyperacanthomysis.longirostris.Adult",
                "Limnoithona.tetraspina.Adult")
 #change factor levels and names for regions
 data$Region<-ifelse(data$Region=="SouthCentral","South Central",data$Region)
