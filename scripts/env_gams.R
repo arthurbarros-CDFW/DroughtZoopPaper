@@ -19,6 +19,7 @@ library(brms)
 library(DroughtData)
 library(rstan)
 library(lme4)
+library(stats)
 
 Zoop_BPUE<-readRDS("data/Zoop_BPUE.rds")
 ZPEnvData<-read_excel("data/ZPEnvData.xlsx")
@@ -125,39 +126,35 @@ for(i in 1:length(taxa)){
   d<-dplyr::select(d,BPUE,salinity,month,Station,Drought)
   d$Station<-as.factor(d$Station)
   d$Drought<-as.factor(d$Drought)
-  
-  m1<-gam(BPUE~s(salinity),family="nb",data=d)
-  summary(m1)
-  m2<-gam(BPUE~s(salinity)+s(month,k=5),family='nb',data=d)
-  summary(m2)
-  #Now with a random effect of station
-  m3<-gamm(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d)
-  summary(m3[[1]])
-  summary(m3[[2]])
+#  m1<-gam(BPUE~s(salinity),family="nb",data=d)
+#  summary(m1)
+#  m2<-gam(BPUE~s(salinity)+s(month,k=5),family='nb',data=d)
+#  summary(m2)
+#  #Now with a random effect of station
+#  m3<-gamm(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d)
   
   #try two seperate models for p/a binomial and just presence nb
   d_pa<-d
   d_pa$Presence<-ifelse(d_pa$BPUE>0,1,0)
   d_p<-d_pa%>%filter(Presence==1)
-  m4.1<-glmer(Presence~salinity+ns(month,df=2)+(1|Station),family="binomial",data=d_pa)
+  m4.1<-gam(Presence~s(salinity)+s(month,k=5),random = list(Station = ~1),family="binomial",data=d_pa)
   summary(m4.1)
-  m41_predict<-predict(m4.1,type = "response")
   m4.2<-gam(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d_p)
   summary(m4.2)
  
-  capture.output(summary(m1),file=paste("outputs/model_outputs/",t,"_m1.txt"))
-  capture.output(summary(m2),file=paste("outputs/model_outputs/",t,"_m2.txt"))
-  capture.output(summary(m3[[2]]),file=paste("outputs/model_outputs/",t,"_m3.txt"))
+  #capture.output(summary(m1),file=paste("outputs/model_outputs/",t,"_m1.txt"))
+  #capture.output(summary(m2),file=paste("outputs/model_outputs/",t,"_m2.txt"))
+  #capture.output(summary(m3[[2]]),file=paste("outputs/model_outputs/",t,"_m3.txt"))
   capture.output(summary(m4.1),file=paste("outputs/model_outputs/",t,"_m4_1.txt"))
   capture.output(summary(m4.2),file=paste("outputs/model_outputs/",t,"_m4_2.txt"))
   
   #Anova or AIC to test compare model fits?
-  m_anova<-anova(m1,m2,m3, m4.1)
-  m_anova
-  capture.output(m_anova,file=paste("outputs/model_outputs/",t,"_m_anova.txt"))
-  m_aic<-AIC(m1,m2,m4.1,m4.2)
-  m_aic
-  capture.output(m_aic,file=paste("outputs/model_outputs/",t,"_m_aic.txt"))
+  #m_anova<-anova(m1,m2,m3, m4.1)
+  #m_anova
+  #capture.output(m_anova,file=paste("outputs/model_outputs/",t,"_m_anova.txt"))
+  #m_aic<-AIC(m1,m2,m4.1,m4.2)
+  #m_aic
+  #capture.output(m_aic,file=paste("outputs/model_outputs/",t,"_m_aic.txt"))
   
   png(paste("figures/gamcheck/",t,"_m4_1.png"))
   par(mfrow=c(2,2))
@@ -169,11 +166,9 @@ for(i in 1:length(taxa)){
   gam.check(m4.2)
   dev.off()
   
+  png(paste("figures/gamcheck/",t,"_salspline.png"))
+  par(mfrow=c(1,1))
+  plot.gam(m4.2,select=1)
+  abline(h=0)
+  dev.off()
 }
-
-#another method for random effects:
-  m5 = gamm(BPUE~s(salinity)+s(month,k=5) + s(Station, bs = "re"), niterPQL=40,family='nb',data=d)
-  summary(m5[[1]])
-  summary(m5[[2]])
-  plot(m5[[2]])
-  

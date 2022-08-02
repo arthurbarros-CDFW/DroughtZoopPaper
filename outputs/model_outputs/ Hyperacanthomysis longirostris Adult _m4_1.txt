@@ -1,31 +1,22 @@
-Generalized linear mixed model fit by maximum likelihood (Laplace Approximation) ['glmerMod']
- Family: binomial  ( logit )
-Formula: Presence ~ salinity + ns(month, df = 2) + (1 | Station)
-   Data: d_pa
 
-     AIC      BIC   logLik deviance df.resid 
-  5442.3   5474.1  -2716.1   5432.3     4244 
+Family: binomial 
+Link function: logit 
 
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--1.0675 -0.9223 -0.5534  1.0385  2.8318 
+Formula:
+Presence ~ s(salinity) + s(month, k = 5)
 
-Random effects:
- Groups  Name        Variance Std.Dev.
- Station (Intercept) 1.925    1.387   
-Number of obs: 4249, groups:  Station, 17
-
-Fixed effects:
-                   Estimate Std. Error z value Pr(>|z|)  
-(Intercept)        -0.08345    0.35513  -0.235   0.8142  
-salinity           -0.01362    0.01346  -1.012   0.3115  
-ns(month, df = 2)1  0.48720    0.19187   2.539   0.0111 *
-ns(month, df = 2)2 -0.05693    0.10353  -0.550   0.5824  
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  -0.2298     0.0315  -7.295    3e-13 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Correlation of Fixed Effects:
-            (Intr) salnty n(,d=2)1
-salinity    -0.042                
-ns(mn,d=2)1 -0.169 -0.354         
-ns(mn,d=2)2 -0.016 -0.386  0.202  
+Approximate significance of smooth terms:
+              edf Ref.df  Chi.sq p-value    
+s(salinity) 8.064  8.753 152.722  <2e-16 ***
+s(month)    1.460  1.777   3.591  0.0914 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.0358   Deviance explained = 2.84%
+UBRE = 0.34024  Scale est. = 1         n = 4249
