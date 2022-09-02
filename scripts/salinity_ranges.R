@@ -133,6 +133,7 @@ Taxlifestage<-taxa
 taxa_sal_range<-data.frame(Taxlifestage,sal_min,sal_max)
 #so next for each taxa we will do a boxplot and TukeyHSD for drought year type within target salinity range
 
+plot_list<-list()
 for(i in 1:length(taxa)){
   t<-taxa[[i]]
   sal<-taxa_sal_range%>%filter(Taxlifestage==t)
@@ -142,14 +143,16 @@ for(i in 1:length(taxa)){
     filter(Drought!="N")%>%
     group_by(month,year,Drought)%>%
     dplyr::summarise(BPUE=mean(BPUE))
+  t<-gsub(" Adult","",t)
   p<-ggplot(d, aes(x = Drought, y = log(BPUE+1), fill=Drought)) +
     geom_boxplot(aes())+
     theme_bw()+
     drt_color_pal_drought(aes_type = "fill")+
-    ggtitle(t)+
+    ggtitle(t, subtitle=paste('salinity zone:',sal$sal_min,'ppt - ',sal$sal_max,'ppt',sep=""))+
     theme(text = element_text(size=24),legend.position = "none")+
     xlab("Year Type")+ylab("ln(BPUE+1)")
   p
+  plot_list[[i]]=p
   save_plot(paste("figures/sal_zones/",t,".png"),p,base_height = 8,base_width = 8)
   m<-aov(log(BPUE+1)~Drought,data=d)
   summary(m)
@@ -157,6 +160,9 @@ for(i in 1:length(taxa)){
   capture.output(summary(m),file=paste("figures/sal_zones/",t,".txt"))
   capture.output(TukeyHSD(m),file=paste("figures/sal_zones/",t,"TUKEY.txt"))
 }
+all_plots<-plot_grid(plotlist=plot_list,labels = "AUTO", align = "v",ncol=2)
+all_plots
+save_plot("figures/sal_zones/all_comparison.png", all_plots,ncol=1,base_height = 14,base_width = 14)
 
 ############Next lets plot where the salinity zone was?
 ez_distances<-readRDS("data/ez_distances.rds")

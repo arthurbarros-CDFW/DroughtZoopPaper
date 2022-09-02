@@ -98,8 +98,8 @@ drought_change$Taxa<-gsub(" Adult","",drought_change$Taxa)
 
 p<-ggplot(drought_change,aes(x=Taxa,y=Region,fill=pct_change))+
   geom_tile()+
-  scale_fill_gradientn(colours=c("blue","white","red"))+
-  theme(axis.text.x = element_text(angle = 45, vjust =.9, hjust=.9),axis.text = element_text(size=14,face="bold"))+
+  scale_fill_gradientn(name="% change",colours=c("blue","white","red"))+
+  theme(axis.text.x = element_text(angle = 45, vjust =.9, hjust=.9),axis.text = element_text(size=14,face="bold"),axis.title = element_blank())+
   geom_label(aes(label=paste("% change: ",round(pct_change,1))),size=4,fill="white")+
   geom_label(aes(label=paste("p-value: ",p1)),size=4,nudge_y = -.2,fill="white")
 p

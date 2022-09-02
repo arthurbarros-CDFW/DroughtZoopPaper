@@ -135,6 +135,7 @@ predict_posterior<-function(model, newdata, n=1e4, seed=999){
 }
 
 models<-list()
+plot_list<-list()
 for(i in 1:length(taxa)){
   t<-taxa[i]
   d<-model_data%>%filter(Taxlifestage==t & !is.na(salinity) & year>1993 & month %in% target_months)
@@ -155,7 +156,12 @@ for(i in 1:length(taxa)){
   m4.1<-gam(Presence~s(salinity),family="binomial",data=d_pa)
   summary(m4.1)
   models[[taxa[i]]][["presence"]]<-m4.1
-  m4.2<-gam(BPUE~s(salinity)+s(month,k=5)+ s(Station, bs='re'), niterPQL=40,family='nb',data=d_p)
+  m4.2<-if(t=="Daphnia Adult"){
+    gam(BPUE~s(salinity)+s(month,k=5)+ s(Station, bs='re'),niterPQL=40,family='nb',data=d_p)
+  }else{
+          gam(BPUE~s(salinity)+s(month,k=5), niterPQL=40,family='nb',data=d_p)
+    }
+  
   summary(m4.2)
   models[[taxa[i]]][["abundance"]]<-m4.2
  
@@ -208,8 +214,14 @@ for(i in 1:length(taxa)){
   p<-ggplot(preds_tidy, aes(x=salinity, ymin=l95, y=median, ymax=u95))+
     geom_ribbon(alpha=0.4)+
     geom_line()+
-    ggtitle(t,subtitle ="combined presence/absence and abundance model predictions")+
-    theme_bw()
+    ggtitle(t)+
+    labs(x="salinity(ppt)",y="BPUE")+
+    theme_bw()+
+    theme(text = element_text(size = 20))
   p
+  plot_list[[i]]=p
   save_plot(paste("figures/gamcheck/",t,"_predict.png",sep=""),p,base_height = 5,base_width = 8)
 }
+all_plots<-plot_grid(plotlist=plot_list,align = "v",ncol=1)
+all_plots
+save_plot("figures/gamcheck/all_gams.png", all_plots,ncol=1,base_height = 14,base_width = 9)
