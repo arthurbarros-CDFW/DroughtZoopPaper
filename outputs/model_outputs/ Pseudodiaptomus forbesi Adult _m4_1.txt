@@ -3,20 +3,19 @@ Family: binomial
 Link function: logit 
 
 Formula:
-Presence ~ s(salinity) + s(month, k = 5)
+Presence ~ s(salinity)
 
 Parametric coefficients:
             Estimate Std. Error z value Pr(>|z|)   
-(Intercept)  0.10156    0.03134   3.241  0.00119 **
+(Intercept)   0.1015     0.0313   3.242  0.00119 **
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Approximate significance of smooth terms:
-              edf Ref.df  Chi.sq p-value    
-s(salinity) 8.247  8.845 161.863 < 2e-16 ***
-s(month)    1.000  1.001   8.986 0.00273 ** 
+              edf Ref.df Chi.sq p-value    
+s(salinity) 8.209   8.83  149.9  <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-R-sq.(adj) =  0.0371   Deviance explained = 2.88%
-UBRE = 0.34888  Scale est. = 1         n = 4249
+R-sq.(adj) =  0.0353   Deviance explained = 2.73%
+UBRE = 0.35058  Scale est. = 1         n = 4249

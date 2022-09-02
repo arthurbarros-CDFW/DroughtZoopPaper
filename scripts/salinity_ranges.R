@@ -151,7 +151,7 @@ for(i in 1:length(taxa)){
     xlab("Year Type")+ylab("ln(BPUE+1)")
   p
   save_plot(paste("figures/sal_zones/",t,".png"),p,base_height = 8,base_width = 8)
-  m<-aov(BPUE~Drought,data=d)
+  m<-aov(log(BPUE+1)~Drought,data=d)
   summary(m)
   TukeyHSD(m)
   capture.output(summary(m),file=paste("figures/sal_zones/",t,".txt"))
@@ -180,21 +180,29 @@ for(i in 1:length(taxa)){
   sal<-taxa_sal_range%>%filter(Taxlifestage==t)
   d<-sal_distances%>%filter(Taxlifestage==t)%>%
     filter(between(salinity, sal$sal_min,sal$sal_max) & Drought!="N")
-  d<-unique(dplyr::select(d,SampleDate,Station,salinity,Drought,distance_km))
-  p<-ggplot(d, aes(x = Drought, y = distance_km, fill=Drought)) +
-    annotate("rect",ymin=30,ymax=42,xmin=-Inf,xmax=Inf,alpha=.3,fill="blue")+
+  d<-unique(dplyr::select(d,Taxlifestage,SampleDate,Station,salinity,Drought,distance_km))
+  d2<-d%>%
+    group_by(Drought,year,month,Taxlifestage)%>%
+    dplyr::summarise(max_dis=max(distance_km),min_dis=min(distance_km))
+  d3<-d2%>%group_by(Drought,Taxlifestage)%>%
+    dplyr::summarise(max_mean=mean(max_dis),max_sd=sd(max_dis),min_mean=mean(min_dis),min_sd=sd(min_dis))
+  p<-ggplot(d, aes(x = Drought, fill=Drought)) +
     annotate("rect",ymin=42,ymax=56,xmin=-Inf,xmax=Inf,alpha=.3,fill="green")+
     annotate("rect",ymin=56,ymax=75,xmin=-Inf,xmax=Inf,alpha=.3,fill="yellow")+
     annotate("rect",ymin=75,ymax=90,xmin=-Inf,xmax=Inf,alpha=.3,fill="orange")+
     annotate("rect",ymin=90,ymax=105,xmin=-Inf,xmax=Inf,alpha=.3,fill="red")+
     annotate("rect",ymin=105,ymax=140,xmin=-Inf,xmax=Inf,alpha=.3,fill="purple")+
-    annotate("text", y = 36, x = "D", label = "San Pablo \n Bay",size=3,vjust=3.5)+
     annotate("text", y = 49, x = "D", label = "Carquinez \n Strait",size=3,vjust=3.5)+
     annotate("text", y = 66, x = "D", label = "Suisun",size=3,vjust=8)+
     annotate("text", y = 82, x = "D", label = "West \n Delta",size=3,vjust=3.5)+
     annotate("text", y = 98, x = "D", label = "Central Delta",size=3,vjust=8)+
     annotate("text", y = 122, x = "D", label = "East Delta",size=3,vjust=8)+
-    geom_boxplot(aes())+
+    geom_point(data=d3,color="blue",mapping=aes(x=Drought,y=max_mean),size=3)+
+    geom_point(data=d3,color="red",mapping=aes(x=Drought,y=min_mean),size=3)+
+    geom_errorbar(data=d3,size=1,color="red",mapping=aes(x=Drought,ymin=min_mean-min_sd,ymax=min_mean+min_sd,width=.2))+
+    geom_errorbar(data=d3,size=1,color="blue",mapping=aes(x=Drought,ymin=max_mean-max_sd,ymax=ifelse((max_mean+max_sd)<119.1617,max_mean+max_sd,119.1617),width=.2))+
+    geom_hline(yintercept = 47,linetype="dashed")+
+    geom_hline(yintercept = 119.1617,linetype="dashed")+
     theme_bw()+
     drt_color_pal_drought(aes_type = "fill")+
     ggtitle(paste(t," target salinity zone"),subtitle =paste(sal$sal_min," ppt - ",sal$sal_max," ppt",sep=""))+
@@ -204,3 +212,46 @@ for(i in 1:length(taxa)){
   p
   save_plot(paste("figures/sal_zones/",t,"distances.png"),p,base_height = 5,base_width = 8)
 }
+
+#same as above but one faceted plot
+d<-taxa_sal_range%>%
+  inner_join(sal_distances)%>%filter(!is.na(salinity)&salinity<sal_max & salinity>sal_min &Drought!="N")
+d<-unique(dplyr::select(d,Taxlifestage,SampleDate,Station,salinity,Drought,distance_km,year,month))
+d2<-d%>%
+  group_by(Drought,year,month,Taxlifestage)%>%
+  dplyr::summarise(max_dis=max(distance_km),min_dis=min(distance_km))
+d3<-d2%>%group_by(Drought,Taxlifestage)%>%
+  dplyr::summarise(max_mean=mean(max_dis),max_sd=sd(max_dis),min_mean=mean(min_dis),min_sd=sd(min_dis))
+d3$Taxlifestage<-str_remove(d3$Taxlifestage," Adult")
+p<-ggplot(d3, aes(x = Drought,y=min_mean)) +
+  annotate("rect",ymin=42,ymax=56,xmin=-Inf,xmax=Inf,alpha=.3,fill="green")+
+  annotate("rect",ymin=56,ymax=75,xmin=-Inf,xmax=Inf,alpha=.3,fill="yellow")+
+  annotate("rect",ymin=75,ymax=90,xmin=-Inf,xmax=Inf,alpha=.3,fill="orange")+
+  annotate("rect",ymin=90,ymax=105,xmin=-Inf,xmax=Inf,alpha=.3,fill="red")+
+  annotate("rect",ymin=105,ymax=125,xmin=-Inf,xmax=Inf,alpha=.3,fill="purple")+
+  annotate("text", y = 52, x = "W", label = "Carquinez \n Strait",size=3,vjust=-.5, fontface =2)+
+  annotate("text", y = 66, x = "W", label = "Suisun",size=3,vjust=-2, fontface =2)+
+  annotate("text", y = 82, x = "W", label = "West \n Delta",size=3,vjust=-.5, fontface =2)+
+  annotate("text", y = 98, x = "W", label = "Central Delta",size=3,vjust=-2, fontface =2)+
+  annotate("text", y = 110, x = "W", label = "East Delta",size=3,vjust=-2, fontface =2)+
+  geom_point(data=d3,mapping=aes(x=Drought,y=max_mean,color="less saline",shape="less saline"),size=3)+
+  geom_point(data=d3,mapping=aes(x=Drought,y=min_mean,color="more saline",shape="more saline"),size=3)+
+  geom_errorbar(data=d3,size=1,linetype="twodash",color="red",mapping=aes(x=Drought,ymin=min_mean-min_sd,ymax=min_mean+min_sd,width=.2))+
+  geom_errorbar(data=d3,size=1,color="blue",mapping=aes(x=Drought,ymin=max_mean-max_sd,ymax=ifelse((max_mean+max_sd)<119.1617,max_mean+max_sd,119.1617),width=.2))+
+  geom_hline(yintercept = 47,linetype="dashed")+
+  geom_hline(yintercept = 119.1617,linetype="dashed")+
+  theme_bw()+
+  drt_color_pal_drought(aes_type = "fill")+
+  ggtitle("Dispersion of taxa's target salinity zone")+
+  theme(text = element_text(size=16),strip.text.y = element_text(size = 8,face="bold"))+
+  xlab("Year Type")+ylab("River km")+
+  facet_grid(Taxlifestage~.)+
+  scale_color_manual(name='Salinity Range',
+                     breaks=c('more saline', 'less saline'),
+                     values=c('more saline'='red', 'less saline'='blue'))+
+  scale_shape_manual(name='Salinity Range',
+                     breaks=c('more saline', 'less saline'),
+                     values=c('more saline'=17, 'less saline'=19))+
+  coord_flip()
+p
+save_plot("figures/sal_zones/zone_dists.png",p,base_height = 8,base_width = 10)

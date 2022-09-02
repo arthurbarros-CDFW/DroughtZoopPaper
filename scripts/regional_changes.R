@@ -93,6 +93,9 @@ drought_change<-drought_change%>%
 #drought_change$pct_change<-ifelse(drought_change$p1<0.05,drought_change$pct_change,NA)
 drought_change$Region<-factor(drought_change$Region,levels=c("Suisun Bay","Suisun Marsh","Confluence","South Central"))
 
+drought_change$Taxa<-gsub("[.]"," ",drought_change$Taxa)
+drought_change$Taxa<-gsub(" Adult","",drought_change$Taxa)
+
 p<-ggplot(drought_change,aes(x=Taxa,y=Region,fill=pct_change))+
   geom_tile()+
   scale_fill_gradientn(colours=c("blue","white","red"))+

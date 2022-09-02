@@ -1,5 +1,3 @@
-#GAMS and GLMS of fecundity data
-#tr.ying to look at time changes in mysid fecundity?
 rm( list = ls()) #clear env
 
 library(tidyverse)
@@ -120,6 +118,23 @@ model_data$salinity<-ec_2_sal(25,model_data$beg_surf_sc)
   #inner_join(temp_monthlymean)
 #model_data$scaled_temp<-model_data$beg_surf_temp-model_data$month_temp
 
+# Function to generate posterior predictions from a gam model
+# From https://stats.stackexchange.com/questions/190348/can-i-use-bootstrapping-to-estimate-the-uncertainty-in-a-maximum-value-of-a-gam
+predict_posterior<-function(model, newdata, n=1e4, seed=999){
+  Xp <- predict(model, newdata=newdata, type="lpmatrix", exclude=c("s(month)", "s(Station)"), newdata.guaranteed=TRUE) ## map coefs to fitted curves
+  beta <- coef(model)
+  Vb   <- vcov(model) ## posterior mean and cov of coefs
+  set.seed(seed)
+  mrand <- mvrnorm(n, beta, Vb) ## simulate n rep coef vectors from posterior
+  pred<-matrix(nrow=nrow(newdata), ncol=n)
+  ilink <- family(model)$linkinv
+  for (i in seq_len(n)) { 
+    pred[,i]   <- ilink(Xp %*% mrand[i, ])
+  }
+  return(pred)
+}
+
+models<-list()
 for(i in 1:length(taxa)){
   t<-taxa[i]
   d<-model_data%>%filter(Taxlifestage==t & !is.na(salinity) & year>1993 & month %in% target_months)
@@ -137,10 +152,12 @@ for(i in 1:length(taxa)){
   d_pa<-d
   d_pa$Presence<-ifelse(d_pa$BPUE>0,1,0)
   d_p<-d_pa%>%filter(Presence==1)
-  m4.1<-gam(Presence~s(salinity)+s(month,k=5),random = list(Station = ~1),family="binomial",data=d_pa)
+  m4.1<-gam(Presence~s(salinity),family="binomial",data=d_pa)
   summary(m4.1)
-  m4.2<-gam(BPUE~s(salinity)+s(month,k=5),random = list(Station = ~1), niterPQL=40,family='nb',data=d_p)
+  models[[taxa[i]]][["presence"]]<-m4.1
+  m4.2<-gam(BPUE~s(salinity)+s(month,k=5)+ s(Station, bs='re'), niterPQL=40,family='nb',data=d_p)
   summary(m4.2)
+  models[[taxa[i]]][["abundance"]]<-m4.2
  
   #capture.output(summary(m1),file=paste("outputs/model_outputs/",t,"_m1.txt"))
   #capture.output(summary(m2),file=paste("outputs/model_outputs/",t,"_m2.txt"))
@@ -171,4 +188,28 @@ for(i in 1:length(taxa)){
   plot.gam(m4.2,select=1)
   abline(h=0)
   dev.off()
+  
+  # Generate and combine model predictions
+  # Set up salinity vector to predict over
+  newdata<-data.frame(salinity=seq(quantile(d$salinity, 0.05), quantile(d$salinity, 0.95), length.out=100))
+  # predict for presence model
+  m4.1.post<-predict_posterior(m4.1, newdata=newdata)
+  # predict for abundance model
+  m4.2.post<-predict_posterior(m4.2, newdata=newdata)
+  # Multiply them together
+  post<-m4.1.post*m4.2.post
+  #Collapse to 95% confidence intervals
+  preds<-apply(post, 1, function(x) quantile(x, c(0.025, 0.5, 0.975)))
+  preds_tidy<-newdata%>%
+    bind_cols(
+      tibble(l95=preds["2.5%",], median=preds["50%",], u95=preds["97.5%",])
+    )
+  t<-gsub(" Adult","",t)
+  p<-ggplot(preds_tidy, aes(x=salinity, ymin=l95, y=median, ymax=u95))+
+    geom_ribbon(alpha=0.4)+
+    geom_line()+
+    ggtitle(t,subtitle ="combined presence/absence and abundance model predictions")+
+    theme_bw()
+  p
+  save_plot(paste("figures/gamcheck/",t,"_predict.png",sep=""),p,base_height = 5,base_width = 8)
 }
