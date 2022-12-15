@@ -7,15 +7,15 @@ Presence ~ s(salinity)
 
 Parametric coefficients:
             Estimate Std. Error z value Pr(>|z|)    
-(Intercept)   -2.620      0.228  -11.49   <2e-16 ***
+(Intercept) -0.41339    0.08013  -5.159 2.49e-07 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Approximate significance of smooth terms:
               edf Ref.df Chi.sq p-value    
-s(salinity) 5.942   6.72  537.5  <2e-16 ***
+s(salinity) 6.157  7.046    986  <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-R-sq.(adj) =  0.239   Deviance explained = 27.1%
-UBRE = -0.32737  Scale est. = 1         n = 4249
+R-sq.(adj) =  0.388   Deviance explained = 32.4%
+UBRE = -0.0608  Scale est. = 1         n = 3974

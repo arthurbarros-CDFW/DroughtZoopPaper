@@ -33,8 +33,7 @@ aov3_eqn1 = function(region){
   pvalue <- list(pvalue = format(summary(m)[[1]][["Pr(>F)"]][1], digits = 3))
 }
 
-target_taxa<-c("Daphnia.Adult","Pseudodiaptomus.forbesi.Adult","Hyperacanthomysis.longirostris.Adult",
-               "Limnoithona.tetraspina.Adult")
+target_taxa<-c("Daphnia.Adult","Pseudodiaptomus.forbesi.Adult","Hyperacanthomysis.longirostris.Adult", "Limnoithona.tetraspina.Adult")
 #change factor levels and names for regions
 data$Region<-ifelse(data$Region=="SouthCentral","South Central",data$Region)
 data$Region<-factor(data$Region,levels=c("Suisun Bay","Suisun Marsh","Confluence","South Central","North"))
@@ -96,10 +95,13 @@ drought_change$Region<-factor(drought_change$Region,levels=c("Suisun Bay","Suisu
 drought_change$Taxa<-gsub("[.]"," ",drought_change$Taxa)
 drought_change$Taxa<-gsub(" Adult","",drought_change$Taxa)
 
-p<-ggplot(drought_change,aes(x=Taxa,y=Region,fill=pct_change))+
+library(scales)
+p<-ggplot(drought_change,aes(Taxa,y=Region,fill=pct_change))+
   geom_tile()+
-  scale_fill_gradientn(name="% change",colours=c("blue","white","red"))+
-  theme(axis.text.x = element_text(angle = 45, vjust =.9, hjust=.9),axis.text = element_text(size=14,face="bold"),axis.title = element_blank())+
+  scale_fill_gradientn(colours = c("blue","white","red"), 
+                       values = rescale(c(-100,0,200)),
+                       guide = "colorbar", name="% change")+
+  theme(axis.text.x = element_text(angle = 45, vjust =.9, hjust=.9,face="italic"),axis.text = element_text(size=14,face="bold"),axis.title = element_blank())+
   geom_label(aes(label=paste("% change: ",round(pct_change,1))),size=4,fill="white")+
   geom_label(aes(label=paste("p-value: ",p1)),size=4,nudge_y = -.2,fill="white")
 p

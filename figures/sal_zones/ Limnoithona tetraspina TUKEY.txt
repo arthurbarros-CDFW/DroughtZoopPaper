@@ -5,5 +5,5 @@ Fit: aov(formula = log(BPUE + 1) ~ Drought, data = d)
 
 $Drought
           diff       lwr        upr     p adj
-W-D -0.5898843 -1.004399 -0.1753694 0.0055199
+W-D -0.5919977 -1.014817 -0.1691789 0.0063117
 

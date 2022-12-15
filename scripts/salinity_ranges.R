@@ -112,12 +112,14 @@ for(i in 1:length(taxa)){
   d2[i,3]<-sqrt(var)
 }
 write.csv(d2,"outputs/salinity_ranges.csv",row.names = F)
+d2$taxa<-gsub(" Adult","",d2$taxa)
 p<-ggplot(d2,aes(x=taxa,y=xm))+
   geom_point(stat="identity",color='black',size=2)+
-  geom_errorbar(aes(ymin=xm-sd,ymax=xm+sd,width=.2))+
+  geom_errorbar(aes(ymin=ifelse(xm-sd>0,xm-sd,0),ymax=xm+sd,width=.2))+
   coord_flip()+
   labs(y="Mean salinity",x="")+
-  theme_light()
+  theme_light()+
+  theme(axis.text.y = element_text(face="italic"))
 p
 save_plot("figures/sal_zones/bins.png",p,base_height = 4,base_width = 6)
 
@@ -149,7 +151,7 @@ for(i in 1:length(taxa)){
     theme_bw()+
     drt_color_pal_drought(aes_type = "fill")+
     ggtitle(t, subtitle=paste('salinity zone:',sal$sal_min,'ppt - ',sal$sal_max,'ppt',sep=""))+
-    theme(text = element_text(size=24),legend.position = "none")+
+    theme(text = element_text(size=24),legend.position = "none",plot.title = element_text(face = "italic"))+
     xlab("Year Type")+ylab("ln(BPUE+1)")
   p
   plot_list[[i]]=p
@@ -224,32 +226,36 @@ d<-taxa_sal_range%>%
   inner_join(sal_distances)%>%filter(!is.na(salinity)&salinity<sal_max & salinity>sal_min &Drought!="N")
 d<-unique(dplyr::select(d,Taxlifestage,SampleDate,Station,salinity,Drought,distance_km,year,month))
 d2<-d%>%
+  filter(month<12 & month>4)%>%
   group_by(Drought,year,month,Taxlifestage)%>%
   dplyr::summarise(max_dis=max(distance_km),min_dis=min(distance_km))
 d3<-d2%>%group_by(Drought,Taxlifestage)%>%
   dplyr::summarise(max_mean=mean(max_dis),max_sd=sd(max_dis),min_mean=mean(min_dis),min_sd=sd(min_dis))
 d3$Taxlifestage<-str_remove(d3$Taxlifestage," Adult")
+d3$Taxlifestage[d3$Taxlifestage=="Hyperacanthomysis longirostris"]<-"H. longirostris"
+d3$Taxlifestage[d3$Taxlifestage=="Limnoithona tetraspina"]<-"L. tetraspina"
+d3$Taxlifestage[d3$Taxlifestage=="Pseudodiaptomus forbesi"]<-"P. forbesi"
 p<-ggplot(d3, aes(x = Drought,y=min_mean)) +
-  annotate("rect",ymin=42,ymax=56,xmin=-Inf,xmax=Inf,alpha=.3,fill="green")+
-  annotate("rect",ymin=56,ymax=75,xmin=-Inf,xmax=Inf,alpha=.3,fill="yellow")+
-  annotate("rect",ymin=75,ymax=90,xmin=-Inf,xmax=Inf,alpha=.3,fill="orange")+
-  annotate("rect",ymin=90,ymax=105,xmin=-Inf,xmax=Inf,alpha=.3,fill="red")+
-  annotate("rect",ymin=105,ymax=125,xmin=-Inf,xmax=Inf,alpha=.3,fill="purple")+
-  annotate("text", y = 52, x = "W", label = "Carquinez \n Strait",size=3,vjust=-.5, fontface =2)+
-  annotate("text", y = 66, x = "W", label = "Suisun",size=3,vjust=-2, fontface =2)+
-  annotate("text", y = 82, x = "W", label = "West \n Delta",size=3,vjust=-.5, fontface =2)+
-  annotate("text", y = 98, x = "W", label = "Central Delta",size=3,vjust=-2, fontface =2)+
-  annotate("text", y = 110, x = "W", label = "East Delta",size=3,vjust=-2, fontface =2)+
-  geom_point(data=d3,mapping=aes(x=Drought,y=max_mean,color="less saline",shape="less saline"),size=3)+
-  geom_point(data=d3,mapping=aes(x=Drought,y=min_mean,color="more saline",shape="more saline"),size=3)+
-  geom_errorbar(data=d3,size=1,linetype="twodash",color="red",mapping=aes(x=Drought,ymin=min_mean-min_sd,ymax=min_mean+min_sd,width=.2))+
-  geom_errorbar(data=d3,size=1,color="blue",mapping=aes(x=Drought,ymin=max_mean-max_sd,ymax=ifelse((max_mean+max_sd)<119.1617,max_mean+max_sd,119.1617),width=.2))+
+  #annotate("rect",ymin=42,ymax=56,xmin=-Inf,xmax=Inf,alpha=.3,fill="green")+
+  #annotate("rect",ymin=56,ymax=75,xmin=-Inf,xmax=Inf,alpha=.3,fill="yellow")+
+  #annotate("rect",ymin=75,ymax=90,xmin=-Inf,xmax=Inf,alpha=.3,fill="orange")+
+  #annotate("rect",ymin=90,ymax=105,xmin=-Inf,xmax=Inf,alpha=.3,fill="red")+
+  #annotate("rect",ymin=105,ymax=125,xmin=-Inf,xmax=Inf,alpha=.3,fill="purple")+
+  #annotate("text", y = 52, x = "W", label = "Carquinez \n Strait",size=4,vjust=-.25, fontface =2)+
+  #annotate("text", y = 66, x = "W", label = "Suisun",size=4,vjust=-2, fontface =2)+
+  #annotate("text", y = 82, x = "W", label = "West \n Delta",size=4,vjust=-.25, fontface =2)+
+  #annotate("text", y = 98, x = "W", label = "Central Delta",size=4,vjust=-2, fontface =2)+
+  #annotate("text", y = 110, x = "W", label = "East Delta",size=4,vjust=-2, fontface =2)+
+  geom_point(data=d3,mapping=aes(x=Drought,y=max_mean,color="less saline",shape="less saline"),size=5,position=position_dodge(width=.5))+
+  geom_point(data=d3,mapping=aes(x=Drought,y=min_mean,color="more saline",shape="more saline"),size=5)+
+  geom_errorbar(data=d3,size=2,linetype="twodash",color="red",mapping=aes(x=Drought,ymin=min_mean-min_sd,ymax=min_mean+min_sd,width=.2))+
+  geom_errorbar(data=d3,size=2,color="blue",alpha=.5,mapping=aes(x=Drought,ymin=max_mean-max_sd,ymax=ifelse((max_mean+max_sd)<119.1617,max_mean+max_sd,119.1617),width=.2),position=position_dodge(width=.2))+
   geom_hline(yintercept = 47,linetype="dashed")+
   geom_hline(yintercept = 119.1617,linetype="dashed")+
   theme_bw()+
   drt_color_pal_drought(aes_type = "fill")+
   ggtitle("Dispersion of taxa's target salinity zone")+
-  theme(text = element_text(size=16),strip.text.y = element_text(size = 8,face="bold"))+
+  theme(text = element_text(size=17),strip.text.y = element_text(size = 14,face="italic"))+
   xlab("Year Type")+ylab("River km")+
   facet_grid(Taxlifestage~.)+
   scale_color_manual(name='Salinity Range',

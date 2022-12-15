@@ -41,7 +41,7 @@ Taxlifestage<-c("Daphnia Adult",
                                     "Pseudodiaptomus forbesi Adult",
                                     "Limnoithona tetraspina Adult",
                                     "Hyperacanthomysis longirostris Adult")
-SizeClass<-c("Meso","Meso","Micro","Macro")
+SizeClass<-c("Meso","Meso","Micro","Macro","Meso")
 target_sizes<-data.frame(Taxlifestage,SizeClass)
 EMP_BPUE<-EMP_BPUE%>%
   inner_join(target_sizes)%>%
@@ -67,7 +67,7 @@ Env_BPUE<-Env_BPUE%>%
 
 #pivot and fill in 0s
 Env_BPUE_wide<-Env_BPUE%>%pivot_wider(names_from = Taxlifestage,values_from=BPUE,values_fill=0)
-Env_BPUE<-Env_BPUE_wide%>%pivot_longer(cols=14:17,names_to="Taxlifestage",values_to="BPUE")
+Env_BPUE<-Env_BPUE_wide%>%pivot_longer(cols=14:18,names_to="Taxlifestage",values_to="BPUE")
 
 #bring in WY drought data
 WY<-read_excel("Data/Water years.xlsx", sheet="yearassignments")
@@ -138,7 +138,7 @@ models<-list()
 plot_list<-list()
 for(i in 1:length(taxa)){
   t<-taxa[i]
-  d<-model_data%>%filter(Taxlifestage==t & !is.na(salinity) & year>1993 & month %in% target_months)
+  d<-model_data%>%filter(Taxlifestage==t & !is.na(salinity) & year>1993)
   d<-dplyr::select(d,BPUE,salinity,month,Station,Drought)
   d$Station<-as.factor(d$Station)
   d$Drought<-as.factor(d$Drought)
@@ -217,7 +217,7 @@ for(i in 1:length(taxa)){
     ggtitle(t)+
     labs(x="salinity(ppt)",y="BPUE")+
     theme_bw()+
-    theme(text = element_text(size = 20))
+    theme(text = element_text(size = 20),plot.title = element_text(face = "italic"))
   p
   plot_list[[i]]=p
   save_plot(paste("figures/gamcheck/",t,"_predict.png",sep=""),p,base_height = 5,base_width = 8)
